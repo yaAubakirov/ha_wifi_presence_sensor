@@ -1,0 +1,8 @@
+{
+    "name": "WiFi Presence Sensor",
+    "description": "Detects presence based on WiFi network scanning",
+    "domain": "wifi_presence",
+    "homeassistant": "2023.1.0",
+    "render_readme": true,
+    "country": "GLOBAL"
+  }
