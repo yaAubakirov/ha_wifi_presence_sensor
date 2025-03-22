@@ -1,6 +1,7 @@
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
+from homeassistant.helpers.entity_registry import async_get
 
 DOMAIN = "wifi_presence"
 
@@ -20,7 +21,7 @@ class WifiPresenceOptionsFlowHandler(config_entries.OptionsFlow):
         errors = {}
 
         # Get entity registry
-        entity_registry = await self.hass.helpers.entity_registry.async_get_registry()
+        entity_registry = async_get(self.hass)
 
         # Fetch all device_tracker entities
         device_trackers = {
@@ -29,14 +30,19 @@ class WifiPresenceOptionsFlowHandler(config_entries.OptionsFlow):
             if entity_id.startswith("device_tracker.")
         }
 
+        if not device_trackers:
+            errors["base"] = "no_devices_found"
+
         if user_input is not None:
             return self.async_create_entry(title="", data={"selected_devices": user_input["selected_devices"]})
 
         return self.async_show_form(
             step_id="select_devices",
             data_schema=vol.Schema({
-                vol.Required("selected_devices", default=self.config_entry.options.get("selected_devices", [])): 
-                vol.In({v: k for k, v in device_trackers.items()}),  # Show friendly names
+                vol.Required(
+                    "selected_devices", 
+                    default=self.config_entry.options.get("selected_devices", []) if self.config_entry.options.get("selected_devices") is not None else []
+                ): vol.In(device_trackers),  # Show friendly names
             }),
             errors=errors
         )

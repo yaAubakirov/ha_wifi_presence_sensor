@@ -31,14 +31,24 @@ class WifiPresenceConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "duplicate_mac"
             else:
                 self.devices[device_name] = mac_address
-                return self.async_create_entry(title="WiFi Presence", data=self.devices)
+                return self.async_create_entry(title="WiFi Presence", data={"known_devices": self.devices})
 
-        return self.async_create_entry(
-            title="WiFi Presence",
-            data={},
-            options={"known_devices": self.devices}  # Store known devices in options
+        return self.async_show_form(
+            step_id="user",
+            data_schema=DEVICE_SCHEMA,
+            errors=errors
         )
-    
+
     async def async_step_options(self, user_input=None):
-        """Redirect to options flow."""
-        return self.async_create_entry(title="", data=self.config_entry.options)
+        """Handle the options flow for modifying known devices."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data={"known_devices": user_input})
+
+        options_schema = vol.Schema(
+            {vol.Optional(name, default=mac): str for name, mac in self.devices.items()}
+        )
+
+        return self.async_show_form(
+            step_id="options",
+            data_schema=options_schema
+        )

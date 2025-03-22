@@ -3,8 +3,8 @@
     "name": "WiFi Presence Sensor",
     "version": "1.0.0",
     "documentation": "https://github.com/yaaubakirov/ha_wifi_presence_sensor",
-    "dependencies": [],
-    "codeowners": ["@your_github_username"],
-    "requirements": ["scapy"],
+    "dependencies": ["device_tracker"],
+    "codeowners": ["@yaaubakirov"],
+    "requirements": ["scapy", "python-nmap"],
     "config_flow": true
-  }
+}
